@@ -1,109 +1,196 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>keks.design | Premium UI/UX & Frontend</title>
-    <meta name="description" content="Премиальное портфолио продуктового дизайнера Keks.">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <nav class="navbar reveal">
-        <div class="logo">keks.design</div>
-        <div class="nav-links hidden-mobile">
-            <a href="#about">Обо мне</a>
-            <a href="#services">Услуги</a>
-            <a href="#portfolio">Кейсы</a>
-        </div>
-        <a href="https://t.me/KeksDesign" target="_blank" class="btn-primary btn-small">Связаться</a>
-    </nav>
+:root {
+    --bg-base: #000000;
+    --card-bg: #0A0A0A;
+    --border-color: #1A1A1A;
+    --border-hover: #333333;
+    
+    --text-main: #FFFFFF;
+    --text-muted: #8A8A93;
+    --text-dark: #000000;
 
-    <main>
-        <section id="hero" class="hero section">
-            <div class="hero-container reveal">
-                <div class="badge-solid">
-                    <span class="badge-dot"></span> Открыт к проектам
-                </div>
-                <h1 class="hero-title">Дизайн, который<br><span class="text-muted">создает тренды.</span></h1>
-                <p class="hero-subtitle">Проектирую премиальные интерфейсы, сложные дашборды и платежную инфраструктуру. Эстетика Clean Tech с фокусом на идеальную конверсию.</p>
-                <div class="hero-buttons">
-                    <a href="https://t.me/KeksDesign" target="_blank" class="btn-primary">Обсудить проект</a>
-                    <a href="#portfolio" class="btn-secondary">Смотреть работы</a>
-                </div>
-            </div>
-        </section>
+    --border-radius: 16px;
+    --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-        <section id="about" class="section">
-            <div class="bento-grid" id="cards-container">
-                <div class="bento-item span-2 solid-card reveal">
-                    <div class="card-content">
-                        <h2 class="bento-title">Инженерия опыта</h2>
-                        <p class="bento-text">Я не просто рисую картинки. Более 4 лет я создаю дизайн, который легко верстать и масштабировать. Глубокое понимание Frontend позволяет мне проектировать интерфейсы, которые в коде работают так же безупречно, как выглядят в Figma.</p>
-                    </div>
-                </div>
+* {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
 
-                <div class="bento-item solid-card reveal" style="transition-delay: 0.1s;">
-                    <div class="card-content">
-                        <h3 class="bento-subtitle text-white">Стек & Тулзы</h3>
-                        <ul class="clean-list">
-                            <li>Figma & Auto Layout</li>
-                            <li>Design Systems</li>
-                            <li>Web3 / FinTech UI</li>
-                            <li>Frontend (Vanilla)</li>
-                        </ul>
-                    </div>
-                </div>
+body {
+    background-color: var(--bg-base);
+    color: var(--text-main);
+    line-height: 1.5;
+    overflow-x: hidden;
+}
 
-                <div class="bento-item solid-card reveal" style="transition-delay: 0.2s;">
-                    <div class="card-content">
-                        <h3 class="bento-subtitle">Landing Page</h3>
-                        <div class="price">от $500</div>
-                        <p class="bento-text small">Премиальный визуал, глубокая аналитика, анимации и подготовка к верстке.</p>
-                    </div>
-                </div>
+/* =========================================
+   Навигация
+========================================= */
+.navbar {
+    position: fixed; top: 0; left: 0; width: 100%;
+    padding: 1.2rem 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--bg-base);
+    border-bottom: 1px solid transparent;
+    z-index: 100;
+    transition: var(--transition);
+}
+.navbar.scrolled {
+    border-bottom: 1px solid var(--border-color);
+}
 
-                <div class="bento-item span-2 solid-card reveal" style="transition-delay: 0.3s;">
-                    <div class="card-content flex-col h-100">
-                        <div class="bento-header-flex">
-                            <h3 class="bento-subtitle">Web App & Infrastructure</h3>
-                            <div class="price text-white">от $1200</div>
-                        </div>
-                        <p class="bento-text">Проектирование сложных дашбордов, крипто-кошельков и платежных шлюзов. Создание масштабируемой и строгой дизайн-системы.</p>
-                        <a href="https://t.me/KeksDesign" class="btn-primary mt-auto w-max">Заказать разработку</a>
-                    </div>
-                </div>
-            </div>
-        </section>
+.logo { font-size: 1.2rem; font-weight: 600; letter-spacing: -0.5px; }
+.nav-links { display: flex; gap: 2rem; }
+.nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: var(--transition); }
+.nav-links a:hover { color: var(--text-main); }
 
-        <section id="portfolio" class="section">
-            <div class="section-header reveal">
-                <h2 class="section-title">Последние кейсы</h2>
-                <a href="https://t.me/casebykeks" target="_blank" class="link-arrow">Telegram-канал ↗</a>
-            </div>
-        
-            <div id="tg-feed" class="portfolio-grid">
-                </div>
-        
-            <div id="load-more-container" style="display: none; justify-content: center; margin-top: 3rem;">
-                <button id="load-more-btn" class="btn-secondary">Загрузить ещё</button>
-            </div>
-        </section>
-    </main>
+/* =========================================
+   Кнопки и Бейджи
+========================================= */
+.btn-primary, .btn-secondary {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0.9rem 1.8rem; border-radius: 8px;
+    font-size: 0.95rem; font-weight: 500; text-decoration: none;
+    transition: var(--transition); cursor: pointer; border: none;
+}
+.btn-small { padding: 0.6rem 1.2rem; font-size: 0.85rem; }
 
-    <footer class="footer section reveal">
-        <div class="footer-top">
-            <div class="logo">keks.design</div>
-            <div class="footer-links">
-                <a href="https://t.me/KeksDesign" target="_blank">Личные сообщения</a>
-                <a href="https://t.me/casebykeks" target="_blank">Канал с работами</a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2026 keks.design. Архитектура и дизайн.</p>
-        </div>
-    </footer>
+.btn-primary { background: var(--text-main); color: var(--text-dark); }
+.btn-primary:hover { transform: translateY(-2px); background: #E0E0E0; }
 
-    <script src="script.js"></script>
-</body>
-</html>
+.btn-secondary {
+    background: transparent; color: var(--text-main);
+    border: 1px solid var(--border-color);
+}
+.btn-secondary:hover {
+    background: var(--card-bg);
+    border-color: var(--border-hover);
+}
+
+.badge-solid {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 0.4rem 1rem; background: var(--card-bg);
+    border: 1px solid var(--border-color); border-radius: 100px;
+    font-size: 0.85rem; font-weight: 500; color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+.badge-dot { width: 8px; height: 8px; background-color: #FFFFFF; border-radius: 50%; }
+
+.text-muted { color: var(--text-muted); }
+.text-white { color: var(--text-main); }
+
+/* =========================================
+   Сетка и Однотонные Карточки
+========================================= */
+.section { padding: 8rem 2rem 4rem; max-width: 1200px; margin: 0 auto; }
+.hero { min-height: 90vh; display: flex; align-items: center; }
+.hero-container { max-width: 800px; }
+.hero-title { font-size: clamp(3rem, 6vw, 5.5rem); font-weight: 600; letter-spacing: -2px; line-height: 1.05; margin-bottom: 1.5rem; }
+.hero-subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2.5rem; line-height: 1.6; max-width: 600px; }
+.hero-buttons { display: flex; gap: 1rem; }
+
+.bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.bento-item.span-2 { grid-column: span 2; }
+
+/* Однотонные блоки */
+.solid-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: border-color 0.3s ease;
+}
+.solid-card:hover { border-color: var(--border-hover); }
+.card-content { padding: 2.5rem; }
+
+.bento-title { font-size: 1.8rem; font-weight: 500; letter-spacing: -0.5px; margin-bottom: 1rem; }
+.bento-subtitle { font-size: 1.2rem; font-weight: 500; margin-bottom: 1rem; }
+.bento-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+.price { font-size: 1.5rem; font-weight: 500; margin-bottom: 0.5rem; }
+
+.clean-list { list-style: none; }
+.clean-list li { padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-muted); }
+.clean-list li:last-child { border-bottom: none; }
+
+.flex-col { display: flex; flex-direction: column; }
+.h-100 { height: 100%; }
+.mt-auto { margin-top: auto; }
+.w-max { width: max-content; }
+.bento-header-flex { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+
+/* =========================================
+   Портфолио & Плавная загрузка картинок
+========================================= */
+.section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; }
+.section-title { font-size: 2rem; font-weight: 500; letter-spacing: -1px; }
+.link-arrow { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: var(--transition); }
+.link-arrow:hover { color: var(--text-main); }
+
+.portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+.case-card { cursor: pointer; text-decoration: none; transition: transform 0.3s, border-color 0.3s; }
+.case-card:hover { transform: translateY(-4px); }
+.case-card .card-content { padding: 1.5rem; }
+
+.case-img-container {
+    width: 100%;
+    height: 240px;
+    background: #050505;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Анимация пульсации (Skeleton) до загрузки картинки */
+.skeleton-loader {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(90deg, #050505 25%, #0f0f0f 50%, #050505 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.case-img {
+    width: 100%; height: 100%; object-fit: cover;
+    opacity: 0; /* Скрыта до загрузки */
+    transition: opacity 0.6s ease-in-out;
+    position: relative; z-index: 2;
+}
+
+.case-img.loaded { opacity: 1; } /* Плавно появляется */
+
+.svg-fallback {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: #050505; color: #333; z-index: 1;
+}
+
+.case-text { color: var(--text-main); font-size: 1rem; font-weight: 500; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.case-date { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.8rem; }
+
+/* Подвал */
+.footer { border-top: 1px solid var(--border-color); padding-top: 4rem; padding-bottom: 2rem; }
+.footer-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem; }
+.footer-links { display: flex; gap: 2rem; }
+.footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: var(--transition); }
+.footer-links a:hover { color: var(--text-main); }
+.footer-bottom { text-align: left; color: var(--text-muted); font-size: 0.85rem; }
+
+/* Анимации появления секций */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+.reveal.active { opacity: 1; transform: translateY(0); }
+
+/* Адаптив */
+@media (max-width: 900px) {
+    .bento-grid { grid-template-columns: 1fr; }
+    .bento-item.span-2 { grid-column: span 1; }
+    .hidden-mobile { display: none; }
+    .hero-title { font-size: 2.8rem; }
+    .footer-top { flex-direction: column; gap: 2rem; align-items: flex-start; }
+}
