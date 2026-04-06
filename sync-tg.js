@@ -1,6 +1,7 @@
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
+const { URL } = require('url');
 
 const CHANNEL_NAME = 'casebykeks';
 const IMG_DIR = path.join(__dirname, 'cases-img');
@@ -9,23 +10,27 @@ if (!fs.existsSync(IMG_DIR)) {
     fs.mkdirSync(IMG_DIR);
 }
 
-// Улучшенная функция скачивания: умеет ходить по редиректам (301, 302)
-function downloadImage(url, filepath) {
+// Функция скачивания с умной обработкой редиректов
+function downloadImage(requestUrl, filepath) {
     return new Promise((resolve, reject) => {
-        https.get(url, {
+        https.get(requestUrl, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
         }, (res) => {
             if (res.statusCode === 200) {
                 res.pipe(fs.createWriteStream(filepath))
                    .on('error', reject)
                    .once('close', () => resolve(filepath));
-            } else if (res.statusCode === 301 || res.statusCode === 302) {
-                // Если прокси делает редирект — следуем по нему
-                downloadImage(res.headers.location, filepath).then(resolve).catch(reject);
+            } else if ([301, 302, 307, 308].includes(res.statusCode)) {
+                // Если прокси отдает редирект, мы склеиваем его с оригинальным URL,
+                // чтобы избежать ошибки ERR_INVALID_URL при относительных путях
+                const redirectUrl = new URL(res.headers.location, requestUrl).href;
+                console.log(`Редирект на: ${redirectUrl}`);
+
+                downloadImage(redirectUrl, filepath).then(resolve).catch(reject);
             } else {
-                console.warn(`Ошибка скачивания: статус ${res.statusCode} для ${url}`);
+                console.warn(`Ошибка скачивания: статус ${res.statusCode} для ${requestUrl}`);
                 res.resume();
                 resolve(null);
             }
@@ -72,8 +77,7 @@ async function parsePosts(html) {
         if (imgMatch && imgMatch[1]) {
             const rawUrl = imgMatch[1];
 
-            // Используем codetabs — он не режет картинки.
-            // Альтернатива если и этот отвалится: `https://api.allorigins.win/raw?url=${encodeURIComponent(rawUrl)}`
+            // Используем codetabs для обхода блокировок
             const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${rawUrl}`;
 
             const fileName = `case_${new Date(date).getTime()}.jpg`;
@@ -99,7 +103,7 @@ async function run() {
         const posts = await parsePosts(html);
 
         fs.writeFileSync('posts.json', JSON.stringify(posts, null, 2));
-        console.log(`Успешно спарсено: ${posts.length} постов.`);
+        console.log(`\nУспешно спарсено: ${posts.length} постов.`);
         console.log("Проверь папку /cases-img/, там должны лежать загруженные картинки.");
     } catch (err) {
         console.error("Ошибка выполнения:", err);
