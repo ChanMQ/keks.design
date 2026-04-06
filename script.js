@@ -110,73 +110,71 @@ async function fetchTelegramPosts() {
     }
 }
 
-let allPosts = [];
-let displayedCount = 0;
-const STEP = 6; // Сколько постов грузить за раз
-
-document.addEventListener('DOMContentLoaded', () => {
-    initScrollAnimations();
-    initSpotlightEffect();
-    fetchTelegramPosts();
-});
+let allPosts = []; // Хранилище для всех загруженных постов
+let displayedCount = 0; // Сколько постов уже показано
+const POSTS_PER_PAGE = 6;
 
 async function fetchTelegramPosts() {
     const feedContainer = document.getElementById('tg-feed');
+    const loadMoreBtn = document.getElementById('load-more-btn');
+
     try {
         const response = await fetch(`./posts.json?t=${new Date().getTime()}`);
-        if (!response.ok) throw new Error('404');
+        if (!response.ok) throw new Error('Ошибка загрузки');
 
         allPosts = await response.json();
-        feedContainer.innerHTML = ''; // Убираем лоадер
+        feedContainer.innerHTML = '';
 
-        if (allPosts.length === 0) throw new Error('Empty');
+        renderNextBatch(); // Показываем первые 6
 
-        renderBatch(); // Показываем первую порцию
-
-    } catch (e) {
-        feedContainer.innerHTML = '<div class="glass-card" style="padding:2rem;text-align:center;">Работы скоро появятся</div>';
+    } catch (error) {
+        console.error(error);
+        // Вызов вашего красивого Fallback...
     }
 }
 
-function renderBatch() {
+function renderNextBatch() {
     const feedContainer = document.getElementById('tg-feed');
-    const btnContainer = document.getElementById('load-more-container');
+    const loadMoreBtn = document.getElementById('load-more-container');
 
-    const nextBatch = allPosts.slice(displayedCount, displayedCount + STEP);
+    // Вырезаем следующую порцию данных
+    const nextBatch = allPosts.slice(displayedCount, displayedCount + POSTS_PER_PAGE);
 
-    nextBatch.forEach((post, i) => {
-        const postDate = new Date(post.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+    nextBatch.forEach((post, index) => {
         const card = document.createElement('a');
         card.href = post.link;
         card.target = "_blank";
         card.className = 'glass-card case-card reveal';
 
-        // Премиальная SVG заглушка (иконка изображения)
-        const svgPlaceholder = `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity:0.15"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`;
+        // SVG Заглушка, если картинка не загрузится
+        const fallbackSVG = `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity:0.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`;
 
         card.innerHTML = `
-            <div class="case-img-wrapper" style="position:relative; height:220px; display:flex; align-items:center; justify-content:center; background:var(--glass-bg); overflow:hidden;">
-                ${post.img ? `<img src="${post.img}" class="case-img" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
-                <div class="svg-fallback" style="display:${post.img ? 'none' : 'flex'}; align-items:center; justify-content:center;">${svgPlaceholder}</div>
+            <div class="case-img-container" style="background: var(--glass-bg); position: relative; height: 220px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                ${post.img
+                    ? `<img src="${post.img}" class="case-img" alt="Case" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+                    : ''}
+                <div class="img-fallback" style="${post.img ? 'display:none;' : 'display:flex;'}">${fallbackSVG}</div>
             </div>
             <div class="card-content">
-                <div class="case-text">${post.text || 'Дизайн-кейс'}</div>
-                <div class="case-date">${postDate}</div>
+                <div class="case-text">${post.text || 'Кейс без описания'}</div>
+                <div class="case-date">${new Date(post.date).toLocaleDateString('ru-RU', {day:'numeric', month:'short'})}</div>
             </div>
         `;
 
         feedContainer.appendChild(card);
-        setTimeout(() => card.classList.add('active'), i * 100);
+        setTimeout(() => card.classList.add('active'), 100 * index);
     });
 
     displayedCount += nextBatch.length;
 
-    // Управляем кнопкой "Загрузить ещё"
-    if (displayedCount < allPosts.length) {
-        btnContainer.style.display = 'flex';
+    // Прячем кнопку, если посты закончились
+    if (displayedCount >= allPosts.length) {
+        loadMoreBtn.style.display = 'none';
     } else {
-        btnContainer.style.display = 'none';
+        loadMoreBtn.style.display = 'flex';
     }
 }
 
-document.getElementById('load-more-btn')?.addEventListener('click', renderBatch);
+// Привязываем кнопку
+document.getElementById('load-more-btn').addEventListener('click', renderNextBatch);
