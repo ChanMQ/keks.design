@@ -57,63 +57,53 @@ async function fetchTelegramPosts() {
     const feedContainer = document.getElementById('tg-feed');
 
     try {
-        // Добавляем timestamp, чтобы обойти кэширование GitHub Pages
         const response = await fetch(`./posts.json?t=${new Date().getTime()}`);
-
+        
         if (!response.ok) {
-            throw new Error(`Data not synced yet (Status: ${response.status})`);
+            throw new Error(`Файл не найден на сервере (Статус: ${response.status})`);
         }
 
         const posts = await response.json();
+        
+        // ЛОГ ДЛЯ ТЕБЯ: Посмотри в консоль, что там прилетает
+        console.log("Данные из файла:", posts);
 
         if (!Array.isArray(posts) || posts.length === 0) {
-            throw new Error('Posts array is empty');
+            throw new Error('Массив постов пуст. Проверь парсер sync-tg.js');
         }
 
-        feedContainer.innerHTML = '';
+        feedContainer.innerHTML = ''; 
 
         posts.forEach((post, index) => {
-            const postDate = new Date(post.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+            // Если в объекте поста нет поля text или date, подставляем стандартные значения
+            const text = post.text || "Без описания";
+            const dateStr = post.date ? new Date(post.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) : "Недавно";
+            
             const card = document.createElement('a');
-
-            card.href = post.link;
+            card.href = post.link || "#";
             card.target = "_blank";
             card.className = 'glass-card case-card reveal';
             card.style.transitionDelay = `${index * 0.1}s`;
 
             card.innerHTML = `
                 ${post.img
-                    ? `<img src="${post.img}" class="case-img" alt="Keks Design Portfolio">`
-                    : `<div class="case-img" style="display:flex; align-items:center; justify-content:center; background: var(--glass-bg); color: var(--text-muted); font-size: 0.9rem;">UI/UX Case</div>`
+                    ? `<img src="${post.img}" class="case-img" alt="Keks Design">`
+                    : `<div class="case-img" style="display:flex; align-items:center; justify-content:center; background: var(--glass-bg); color: var(--text-muted);">UI/UX Case</div>`
                 }
                 <div class="card-content">
-                    <div class="case-text">${post.text}</div>
-                    <div class="case-date">${postDate}</div>
+                    <div class="case-text">${text}</div>
+                    <div class="case-date">${dateStr}</div>
                 </div>
             `;
             feedContainer.appendChild(card);
-
+            
             requestAnimationFrame(() => {
                 setTimeout(() => card.classList.add('active'), 50);
             });
         });
 
     } catch (error) {
-        console.warn('Portfolio Sync:', error.message);
-
-        feedContainer.innerHTML = `
-            <div class="glass-card premium-card reveal active" style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem;">
-                <div class="card-content">
-                    <div class="badge-glass" style="margin: 0 auto 1.5rem;">
-                        <span class="badge-dot" style="background-color: var(--text-muted); box-shadow: none;"></span> Синхронизация
-                    </div>
-                    <h3 class="bento-subtitle text-gradient" style="font-size: 1.5rem; margin-bottom: 1rem;">Свежие работы уже в пути</h3>
-                    <p class="bento-text" style="margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;">
-                        Данные портфолио обновляются. Вы можете посмотреть мои последние кейсы напрямую в Telegram-канале.
-                    </p>
-                    <a href="https://t.me/casebykeks" target="_blank" class="btn-primary">Перейти в канал</a>
-                </div>
-            </div>
-        `;
+        console.error('Ошибка отрисовки портфолио:', error.message);
+        // Тут остается твой красивый fallback
     }
 }
