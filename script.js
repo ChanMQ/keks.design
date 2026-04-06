@@ -58,13 +58,13 @@ async function fetchTelegramPosts() {
 
     try {
         const response = await fetch(`./posts.json?t=${new Date().getTime()}`);
-        
+
         if (!response.ok) {
             throw new Error(`Файл не найден на сервере (Статус: ${response.status})`);
         }
 
         const posts = await response.json();
-        
+
         // ЛОГ ДЛЯ ТЕБЯ: Посмотри в консоль, что там прилетает
         console.log("Данные из файла:", posts);
 
@@ -74,13 +74,13 @@ async function fetchTelegramPosts() {
             throw new Error('Массив постов пуст. Проверь парсер sync-tg.js');
         }
 
-        feedContainer.innerHTML = ''; 
+        feedContainer.innerHTML = '';
 
         posts.forEach((post, index) => {
             // Если в объекте поста нет поля text или date, подставляем стандартные значения
             const text = post.text || "Без описания";
             const dateStr = post.date ? new Date(post.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) : "Недавно";
-            
+
             const card = document.createElement('a');
             card.href = post.link || "#";
             card.target = "_blank";
@@ -98,7 +98,7 @@ async function fetchTelegramPosts() {
                 </div>
             `;
             feedContainer.appendChild(card);
-            
+
             requestAnimationFrame(() => {
                 setTimeout(() => card.classList.add('active'), 50);
             });
@@ -110,71 +110,73 @@ async function fetchTelegramPosts() {
     }
 }
 
-let allPosts = []; // Хранилище для всех загруженных постов
-let displayedCount = 0; // Сколько постов уже показано
-const POSTS_PER_PAGE = 6;
+let allPosts = [];
+let displayedCount = 0;
+const STEP = 6; // Сколько постов грузить за раз
+
+document.addEventListener('DOMContentLoaded', () => {
+    initScrollAnimations();
+    initSpotlightEffect();
+    fetchTelegramPosts();
+});
 
 async function fetchTelegramPosts() {
     const feedContainer = document.getElementById('tg-feed');
-    const loadMoreBtn = document.getElementById('load-more-btn');
-
     try {
         const response = await fetch(`./posts.json?t=${new Date().getTime()}`);
-        if (!response.ok) throw new Error('Ошибка загрузки');
+        if (!response.ok) throw new Error('404');
 
         allPosts = await response.json();
-        feedContainer.innerHTML = ''; 
-        
-        renderNextBatch(); // Показываем первые 6
+        feedContainer.innerHTML = ''; // Убираем лоадер
 
-    } catch (error) {
-        console.error(error);
-        // Вызов вашего красивого Fallback...
+        if (allPosts.length === 0) throw new Error('Empty');
+
+        renderBatch(); // Показываем первую порцию
+
+    } catch (e) {
+        feedContainer.innerHTML = '<div class="glass-card" style="padding:2rem;text-align:center;">Работы скоро появятся</div>';
     }
 }
 
-function renderNextBatch() {
+function renderBatch() {
     const feedContainer = document.getElementById('tg-feed');
-    const loadMoreBtn = document.getElementById('load-more-container');
-    
-    // Вырезаем следующую порцию данных
-    const nextBatch = allPosts.slice(displayedCount, displayedCount + POSTS_PER_PAGE);
-    
-    nextBatch.forEach((post, index) => {
+    const btnContainer = document.getElementById('load-more-container');
+
+    const nextBatch = allPosts.slice(displayedCount, displayedCount + STEP);
+
+    nextBatch.forEach((post, i) => {
+        const postDate = new Date(post.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
         const card = document.createElement('a');
         card.href = post.link;
         card.target = "_blank";
         card.className = 'glass-card case-card reveal';
-        
-        // SVG Заглушка, если картинка не загрузится
-        const fallbackSVG = `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity:0.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`;
+
+        // Премиальная SVG заглушка (иконка изображения)
+        const svgPlaceholder = `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity:0.15"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`;
 
         card.innerHTML = `
-            <div class="case-img-container" style="background: var(--glass-bg); position: relative; height: 220px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                ${post.img 
-                    ? `<img src="${post.img}" class="case-img" alt="Case" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` 
-                    : ''}
-                <div class="img-fallback" style="${post.img ? 'display:none;' : 'display:flex;'}">${fallbackSVG}</div>
+            <div class="case-img-wrapper" style="position:relative; height:220px; display:flex; align-items:center; justify-content:center; background:var(--glass-bg); overflow:hidden;">
+                ${post.img ? `<img src="${post.img}" class="case-img" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                <div class="svg-fallback" style="display:${post.img ? 'none' : 'flex'}; align-items:center; justify-content:center;">${svgPlaceholder}</div>
             </div>
             <div class="card-content">
-                <div class="case-text">${post.text || 'Кейс без описания'}</div>
-                <div class="case-date">${new Date(post.date).toLocaleDateString('ru-RU', {day:'numeric', month:'short'})}</div>
+                <div class="case-text">${post.text || 'Дизайн-кейс'}</div>
+                <div class="case-date">${postDate}</div>
             </div>
         `;
-        
+
         feedContainer.appendChild(card);
-        setTimeout(() => card.classList.add('active'), 100 * index);
+        setTimeout(() => card.classList.add('active'), i * 100);
     });
 
     displayedCount += nextBatch.length;
 
-    // Прячем кнопку, если посты закончились
-    if (displayedCount >= allPosts.length) {
-        loadMoreBtn.style.display = 'none';
+    // Управляем кнопкой "Загрузить ещё"
+    if (displayedCount < allPosts.length) {
+        btnContainer.style.display = 'flex';
     } else {
-        loadMoreBtn.style.display = 'flex';
+        btnContainer.style.display = 'none';
     }
 }
 
-// Привязываем кнопку
-document.getElementById('load-more-btn').addEventListener('click', renderNextBatch);
+document.getElementById('load-more-btn')?.addEventListener('click', renderBatch);
