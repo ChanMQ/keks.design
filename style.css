@@ -211,6 +211,29 @@ body.no-scroll {
     padding-top: 1.5rem;
 }
 
+/* --- Стили для хештегов --- */
+.case-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.case-tag {
+    background: var(--border-color);
+    color: var(--text-muted);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.case-card:hover .case-tag {
+    background: var(--border-hover);
+    color: var(--text-main);
+}
+
 /* =========================================
    Модальное окно (Pop-up)
 ========================================= */
@@ -227,7 +250,7 @@ body.no-scroll {
 }
 
 .modal-content {
-    width: 100%; max-width: 800px; max-height: 90vh;
+    width: 100%; max-width: 800px; max-height: 85vh; /* 85vh спасает от обрезки на мобилках */
     display: flex; flex-direction: column; position: relative;
     transform: translateY(20px); transition: transform 0.3s ease;
     overflow: hidden;
@@ -246,9 +269,11 @@ body.no-scroll {
 }
 .modal-close:hover { background: var(--text-main); color: var(--bg-base); transform: scale(1.05); }
 
+/* --- ИСПРАВЛЕНИЕ СКРОЛЛА ЗДЕСЬ --- */
 .modal-scrollable {
     overflow-y: auto;
-    flex-grow: 1;
+    flex: 1 1 auto; /* Позволяет блоку сжиматься и занимать оставшееся место */
+    min-height: 0; /* Магическое свойство Flexbox, чтобы блок не вылезал за границы! */
 }
 
 .modal-scrollable::-webkit-scrollbar { width: 6px; }
@@ -300,9 +325,10 @@ body.no-scroll {
     display: flex; gap: 1rem; padding: 1.5rem 2.5rem;
     background: var(--card-bg);
     border-top: 1px solid var(--border-color);
-    flex-shrink: 0;
+    flex: 0 0 auto; /* Жестко фиксирует подвал, запрещая сжиматься */
 }
 
+/* Подвал */
 .footer { border-top: 1px solid var(--border-color); padding-top: 4rem; padding-bottom: 2rem; }
 .footer-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4rem; }
 .footer-links { display: flex; gap: 2rem; }

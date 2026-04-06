@@ -73,23 +73,34 @@ async function parsePage(html) {
             continue;
         }
 
-        // --- НОВЫЙ БЛОК ПАРСИНГА ТЕКСТА С СОХРАНЕНИЕМ АБЗАЦЕВ ---
         const textMatch = item.match(/js-message_text[^>]*>([\s\S]*?)<\/div>/);
         let text = "";
+        let tags = [];
 
         if (textMatch) {
             let rawText = textMatch[1];
-            // 1. Превращаем <br> в нормальные переносы строк \n
             rawText = rawText.replace(/<br\s*\/?>/gi, '\n');
-            // 2. Вычищаем остальные теги
             text = rawText.replace(/<[^>]*>/g, '');
-            // 3. Возвращаем нормальные символы
             text = text.replace(/&amp;/g, '&')
                        .replace(/&lt;/g, '<')
                        .replace(/&gt;/g, '>')
                        .replace(/&quot;/g, '"')
                        .replace(/&#39;/g, "'")
                        .trim();
+
+            // --- ЛОГИКА ИЗВЛЕЧЕНИЯ ХЕШТЕГОВ ---
+            const hashtagRegex = /#([a-zA-Zа-яА-ЯёЁ0-9_]+)/g;
+            let matchHash;
+            while ((matchHash = hashtagRegex.exec(text)) !== null) {
+                if (!tags.includes(matchHash[0])) {
+                    tags.push(matchHash[0]);
+                }
+            }
+
+            // Вырезаем хештеги из самого текста
+            text = text.replace(/\s*#([a-zA-Zа-яА-ЯёЁ0-9_]+)/g, '').trim();
+            // Убираем лишние пустые строки, которые могли остаться после вырезания
+            text = text.replace(/\n{3,}/g, '\n\n');
         }
 
         if (
@@ -148,6 +159,7 @@ async function parsePage(html) {
         if (text || localImages.length > 0) {
             posts.push({
                 text,
+                tags, // Передаем хештеги в JSON
                 link,
                 img: localImages.length > 0 ? localImages[0] : null,
                 images: localImages,

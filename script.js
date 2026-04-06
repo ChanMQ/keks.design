@@ -56,6 +56,11 @@ function renderNextBatch() {
         const dateOptions = { day: 'numeric', month: 'short', year: 'numeric' };
         const formattedDate = new Date(post.date).toLocaleDateString('ru-RU', dateOptions);
 
+        // Генерируем HTML для хештегов
+        const tagsHTML = post.tags && post.tags.length > 0
+            ? `<div class="case-tags">${post.tags.map(t => `<span class="case-tag">${t}</span>`).join('')}</div>`
+            : '';
+
         card.innerHTML = `
             ${post.img ? `
             <div class="case-img-container">
@@ -64,11 +69,11 @@ function renderNextBatch() {
             </div>` : ''}
             <div class="card-content">
                 <div class="case-text"></div>
+                ${tagsHTML}
                 <div class="case-date">${formattedDate}</div>
             </div>
         `;
 
-        // Используем innerText, чтобы переносы строк отобразились гарантированно
         card.querySelector('.case-text').innerText = post.text || 'Без описания';
 
         card.addEventListener('click', (e) => {
@@ -141,12 +146,23 @@ function openModal(post) {
     const prevBtn = document.getElementById('slider-prev');
     const nextBtn = document.getElementById('slider-next');
 
-    // innerText сохраняет переносы \n
+    // Текст
     document.getElementById('modal-text').innerText = post.text || 'Без описания';
 
+    // Хештеги в модалке
+    const modalTags = document.getElementById('modal-tags');
+    if (post.tags && post.tags.length > 0) {
+        modalTags.innerHTML = post.tags.map(t => `<span class="case-tag">${t}</span>`).join('');
+        modalTags.style.display = 'flex';
+    } else {
+        modalTags.style.display = 'none';
+    }
+
+    // Дата
     const dateOptions = { day: 'numeric', month: 'short', year: 'numeric' };
     document.getElementById('modal-date').innerText = new Date(post.date).toLocaleDateString('ru-RU', dateOptions);
 
+    // Ссылка
     document.getElementById('modal-link-tg').href = post.link;
 
     track.innerHTML = '';
