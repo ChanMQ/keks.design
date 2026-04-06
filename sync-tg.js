@@ -81,14 +81,17 @@ async function parsePage(html) {
             let rawText = textMatch[1];
             rawText = rawText.replace(/<br\s*\/?>/gi, '\n');
             text = rawText.replace(/<[^>]*>/g, '');
+
+            // Расширенная расшифровка спецсимволов, включая восклицательный знак
             text = text.replace(/&amp;/g, '&')
                        .replace(/&lt;/g, '<')
                        .replace(/&gt;/g, '>')
                        .replace(/&quot;/g, '"')
                        .replace(/&#39;/g, "'")
+                       .replace(/&#33;/g, '!')
+                       .replace(/&excl;/g, '!')
                        .trim();
 
-            // --- ЛОГИКА ИЗВЛЕЧЕНИЯ ХЕШТЕГОВ ---
             const hashtagRegex = /#([a-zA-Zа-яА-ЯёЁ0-9_]+)/g;
             let matchHash;
             while ((matchHash = hashtagRegex.exec(text)) !== null) {
@@ -97,9 +100,7 @@ async function parsePage(html) {
                 }
             }
 
-            // Вырезаем хештеги из самого текста
             text = text.replace(/\s*#([a-zA-Zа-яА-ЯёЁ0-9_]+)/g, '').trim();
-            // Убираем лишние пустые строки, которые могли остаться после вырезания
             text = text.replace(/\n{3,}/g, '\n\n');
         }
 
@@ -159,7 +160,7 @@ async function parsePage(html) {
         if (text || localImages.length > 0) {
             posts.push({
                 text,
-                tags, // Передаем хештеги в JSON
+                tags,
                 link,
                 img: localImages.length > 0 ? localImages[0] : null,
                 images: localImages,
