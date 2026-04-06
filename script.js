@@ -50,7 +50,7 @@ function renderNextBatch() {
 
     nextBatch.forEach((post, index) => {
         const card = document.createElement('a');
-        card.href = "#"; // Перехватываем ссылку для модального окна
+        card.href = "#";
         card.className = `solid-card case-card reveal ${post.img ? '' : 'no-image'}`;
 
         const dateOptions = { day: 'numeric', month: 'short', year: 'numeric' };
@@ -63,12 +63,14 @@ function renderNextBatch() {
                 <img class="case-img" alt="Case Image">
             </div>` : ''}
             <div class="card-content">
-                <div class="case-text">${post.text || 'Без описания'}</div>
+                <div class="case-text"></div>
                 <div class="case-date">${formattedDate}</div>
             </div>
         `;
 
-        // Обработчик клика для открытия модалки
+        // Используем innerText, чтобы переносы строк отобразились гарантированно
+        card.querySelector('.case-text').innerText = post.text || 'Без описания';
+
         card.addEventListener('click', (e) => {
             e.preventDefault();
             openModal(post);
@@ -107,7 +109,6 @@ if(document.getElementById('load-more-btn')) {
     document.getElementById('load-more-btn').addEventListener('click', renderNextBatch);
 }
 
-
 /* =========================================
    Логика Модального Окна и Слайдера
 ========================================= */
@@ -118,20 +119,16 @@ function initModal() {
     const modal = document.getElementById('case-modal');
     const closeBtn = document.getElementById('modal-close');
 
-    // Закрытие по крестику
     closeBtn.addEventListener('click', closeModal);
 
-    // Закрытие по клику вне контента (на черный фон)
     modal.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
     });
 
-    // Закрытие по клавише Esc
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
     });
 
-    // Кнопки слайдера
     document.getElementById('slider-prev').addEventListener('click', () => changeSlide(-1));
     document.getElementById('slider-next').addEventListener('click', () => changeSlide(1));
 }
@@ -144,36 +141,31 @@ function openModal(post) {
     const prevBtn = document.getElementById('slider-prev');
     const nextBtn = document.getElementById('slider-next');
 
-    // Заполняем текст и дату
-    document.getElementById('modal-text').innerHTML = post.text || 'Без описания';
+    // innerText сохраняет переносы \n
+    document.getElementById('modal-text').innerText = post.text || 'Без описания';
 
     const dateOptions = { day: 'numeric', month: 'short', year: 'numeric' };
     document.getElementById('modal-date').innerText = new Date(post.date).toLocaleDateString('ru-RU', dateOptions);
 
-    // Ссылки
     document.getElementById('modal-link-tg').href = post.link;
 
-    // Сброс слайдера
     track.innerHTML = '';
     dotsContainer.innerHTML = '';
     currentSlide = 0;
     track.style.transform = `translateX(0%)`;
 
-    // Определяем массив картинок (поддерживаем старую структуру и новую)
     slideImages = post.images && post.images.length > 0 ? post.images : (post.img ? [post.img] : []);
 
     if (slideImages.length === 0) {
-        sliderContainer.style.display = 'none'; // Скрываем слайдер, если текстовый пост
+        sliderContainer.style.display = 'none';
     } else {
         sliderContainer.style.display = 'flex';
 
-        // Создаем картинки
         slideImages.forEach((imgSrc, index) => {
             const img = document.createElement('img');
             img.src = imgSrc;
             track.appendChild(img);
 
-            // Создаем точки, если картинок больше 1
             if (slideImages.length > 1) {
                 const dot = document.createElement('div');
                 dot.className = `dot ${index === 0 ? 'active' : ''}`;
@@ -182,7 +174,6 @@ function openModal(post) {
             }
         });
 
-        // Показываем/скрываем стрелки
         if (slideImages.length > 1) {
             prevBtn.classList.remove('hidden');
             nextBtn.classList.remove('hidden');
@@ -192,7 +183,6 @@ function openModal(post) {
         }
     }
 
-    // Показываем модалку и блокируем скролл сайта
     modal.classList.add('active');
     document.body.classList.add('no-scroll');
 }
@@ -200,12 +190,12 @@ function openModal(post) {
 function closeModal() {
     const modal = document.getElementById('case-modal');
     modal.classList.remove('active');
-    document.body.classList.remove('no-scroll'); // Возвращаем скролл
+    document.body.classList.remove('no-scroll');
 }
 
 function changeSlide(direction) {
     let newIndex = currentSlide + direction;
-    if (newIndex < 0) newIndex = slideImages.length - 1; // Зацикливаем
+    if (newIndex < 0) newIndex = slideImages.length - 1;
     if (newIndex >= slideImages.length) newIndex = 0;
     goToSlide(newIndex);
 }
@@ -215,7 +205,6 @@ function goToSlide(index) {
     const track = document.getElementById('modal-slider-track');
     track.style.transform = `translateX(-${currentSlide * 100}%)`;
 
-    // Обновляем активную точку
     const dots = document.querySelectorAll('.slider-dots .dot');
     dots.forEach((dot, i) => {
         dot.classList.toggle('active', i === currentSlide);

@@ -73,8 +73,24 @@ async function parsePage(html) {
             continue;
         }
 
+        // --- НОВЫЙ БЛОК ПАРСИНГА ТЕКСТА С СОХРАНЕНИЕМ АБЗАЦЕВ ---
         const textMatch = item.match(/js-message_text[^>]*>([\s\S]*?)<\/div>/);
-        let text = textMatch ? textMatch[1].replace(/<[^>]*>/g, '').trim() : "";
+        let text = "";
+
+        if (textMatch) {
+            let rawText = textMatch[1];
+            // 1. Превращаем <br> в нормальные переносы строк \n
+            rawText = rawText.replace(/<br\s*\/?>/gi, '\n');
+            // 2. Вычищаем остальные теги
+            text = rawText.replace(/<[^>]*>/g, '');
+            // 3. Возвращаем нормальные символы
+            text = text.replace(/&amp;/g, '&')
+                       .replace(/&lt;/g, '<')
+                       .replace(/&gt;/g, '>')
+                       .replace(/&quot;/g, '"')
+                       .replace(/&#39;/g, "'")
+                       .trim();
+        }
 
         if (
             text === 'Channel created' ||
@@ -92,10 +108,8 @@ async function parsePage(html) {
         const dateMatch = item.match(/datetime="([^"]*?)"/);
         const date = dateMatch ? dateMatch[1] : new Date().toISOString();
 
-        // Удаляем аватарку канала из строки поиска, чтобы случайно не скачать её
         const cleanItem = item.replace(/<a[^>]+tgme_widget_message_user_pic[^>]+>.*?<\/a>/gs, '');
 
-        // Ищем все фоновые картинки (это и есть фото альбома)
         const imgRegex = /background-image:url\(['"]?([^'"]*?)['"]?\)/g;
         let match;
         const rawUrls = [];
@@ -107,7 +121,6 @@ async function parsePage(html) {
                 if (rawUrl.startsWith('//')) rawUrl = 'https:' + rawUrl;
                 rawUrl = rawUrl.replace(/&amp;/g, '&');
 
-                // Избегаем дубликатов
                 if (!rawUrls.includes(rawUrl)) {
                     rawUrls.push(rawUrl);
                 }
@@ -116,7 +129,6 @@ async function parsePage(html) {
 
         const localImages = [];
 
-        // Скачиваем все найденные картинки для поста
         for (let idx = 0; idx < rawUrls.length; idx++) {
             const rawUrl = rawUrls[idx];
             const fileName = `case_${new Date(date).getTime()}_${idx}.jpg`;
@@ -137,9 +149,7 @@ async function parsePage(html) {
             posts.push({
                 text,
                 link,
-                // img — главная обложка для сетки (сохраняем для обратной совместимости)
                 img: localImages.length > 0 ? localImages[0] : null,
-                // images — массив всех фоток для слайдера в модалке
                 images: localImages,
                 date
             });
@@ -173,7 +183,6 @@ async function run() {
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
-        // Удаляем возможные дубликаты постов
         const uniquePosts = Array.from(new Map(allPosts.map(item => [item.link, item])).values());
         uniquePosts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
