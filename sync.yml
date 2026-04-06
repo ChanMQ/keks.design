@@ -1,0 +1,39 @@
+name: Sync Telegram Portfolio
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # Запуск раз в 24 часа (в 03:00 по UTC)
+  workflow_dispatch: # Позволяет запустить вручную кнопкой в GitHub Actions
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          # Важно: передаем PAT токен сразу при чекауте,
+          # чтобы GitHub Pages гарантированно увидел новые коммиты
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Run sync script
+        run: node sync-tg.js
+
+      - name: Commit and push if changed
+          run: |
+            git config --global user.name 'GitHub Actions Bot'
+            git config --global user.email 'actions@github.com'
+            
+            # Безопасное добавление файлов
+            git add posts.json
+            git add cases-img/ || true
+            
+            git diff --quiet && git diff --staged --quiet || git commit -m "auto: sync telegram posts and images"
+            git push https://${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git
