@@ -6,35 +6,44 @@ const { URL } = require('url');
 const CHANNEL_NAME = 'casebykeks';
 const IMG_DIR = path.join(__dirname, 'cases-img');
 
+// Создаем папку, если ее нет
 if (!fs.existsSync(IMG_DIR)) {
     fs.mkdirSync(IMG_DIR);
 }
 
-// Функция скачивания с умной обработкой редиректов
+// Умная функция скачивания напрямую
 function downloadImage(requestUrl, filepath) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         https.get(requestUrl, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                // Маскируемся под обычный браузер
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
             }
         }, (res) => {
             if (res.statusCode === 200) {
-                res.pipe(fs.createWriteStream(filepath))
-                   .on('error', reject)
-                   .once('close', () => resolve(filepath));
-            } else if ([301, 302, 307, 308].includes(res.statusCode)) {
-                // Если прокси отдает редирект, мы склеиваем его с оригинальным URL,
-                // чтобы избежать ошибки ERR_INVALID_URL при относительных путях
-                const redirectUrl = new URL(res.headers.location, requestUrl).href;
-                console.log(`Редирект на: ${redirectUrl}`);
+                const file = fs.createWriteStream(filepath);
+                res.pipe(file);
 
-                downloadImage(redirectUrl, filepath).then(resolve).catch(reject);
+                file.on('finish', () => {
+                    file.close();
+                    resolve(true); // Успешно скачали
+                });
+
+                file.on('error', () => {
+                    fs.unlink(filepath, () => {}); // Удаляем битый файл
+                    resolve(false);
+                });
+            } else if ([301, 302, 307, 308].includes(res.statusCode)) {
+                const redirectUrl = new URL(res.headers.location, requestUrl).href;
+                downloadImage(redirectUrl, filepath).then(resolve);
             } else {
-                console.warn(`Ошибка скачивания: статус ${res.statusCode} для ${requestUrl}`);
-                res.resume();
-                resolve(null);
+                console.warn(`\n⚠️ Ошибка Telegram CDN (статус ${res.statusCode}): ${requestUrl}`);
+                resolve(false);
             }
-        }).on('error', reject);
+        }).on('error', (err) => {
+            console.error(`\n❌ Ошибка сети: ${err.message}`);
+            resolve(false);
+        });
     });
 }
 
@@ -45,7 +54,7 @@ async function fetchTelegram() {
     return new Promise((resolve, reject) => {
         https.get(url, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
         }, (res) => {
             let data = '';
@@ -75,18 +84,23 @@ async function parsePosts(html) {
         const imgMatch = item.match(/background-image:url\(['"]?([^'"]*?)['"]?\)/);
 
         if (imgMatch && imgMatch[1]) {
+            // Берем ОРИГИНАЛЬНУЮ ссылку Telegram, так как сервера GitHub не заблокированы
             const rawUrl = imgMatch[1];
-
-            // Используем codetabs для обхода блокировок
-            const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${rawUrl}`;
 
             const fileName = `case_${new Date(date).getTime()}.jpg`;
             const filePath = path.join(IMG_DIR, fileName);
 
             console.log(`Скачиваю: ${fileName}...`);
-            await downloadImage(proxyUrl, filePath);
 
-            localImgPath = `./cases-img/${fileName}`;
+            // Ждем завершения скачивания и проверяем статус
+            const isSuccess = await downloadImage(rawUrl, filePath);
+
+            if (isSuccess) {
+                // Записываем путь только если файл реально сохранился на диск!
+                localImgPath = `./cases-img/${fileName}`;
+            } else {
+                console.log(`❌ Пропуск: не удалось скачать ${fileName}`);
+            }
         }
 
         if (text || localImgPath) {
@@ -103,8 +117,7 @@ async function run() {
         const posts = await parsePosts(html);
 
         fs.writeFileSync('posts.json', JSON.stringify(posts, null, 2));
-        console.log(`\nУспешно спарсено: ${posts.length} постов.`);
-        console.log("Проверь папку /cases-img/, там должны лежать загруженные картинки.");
+        console.log(`\n✅ Успешно обработано: ${posts.length} постов.`);
     } catch (err) {
         console.error("Ошибка выполнения:", err);
         process.exit(1);
