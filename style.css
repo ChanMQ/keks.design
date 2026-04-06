@@ -214,6 +214,33 @@ body {
 .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
 .reveal.active { opacity: 1; transform: translateY(0); }
 
+.case-img-container {
+    width: 100%;
+    height: 220px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.case-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.img-fallback {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--glass-bg);
+}
+
+/* Стилизация кнопки "Загрузить ещё" */
+#load-more-btn {
+    padding: 1rem 3rem;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+
 /* Адаптив */
 @media (max-width: 900px) {
     .bento-grid { grid-template-columns: 1fr; }
