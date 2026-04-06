@@ -69,8 +69,18 @@ async function parsePage(html) {
     for (let i = 1; i < items.length; i++) {
         const item = items[i];
 
+        // ФИЛЬТР 1: Пропускаем технические сообщения Telegram (создание канала, смена фото и т.д.)
+        if (item.includes('tgme_widget_message_service')) {
+            continue;
+        }
+
         const textMatch = item.match(/js-message_text[^>]*>([\s\S]*?)<\/div>/);
         let text = textMatch ? textMatch[1].replace(/<[^>]*>/g, '').trim() : "";
+
+        // ФИЛЬТР 2: Дополнительная жесткая зачистка по тексту
+        if (text === 'Channel created' || text === 'Channel photo updated') {
+            continue;
+        }
 
         const linkMatch = item.match(/href="([^"]*?t\.me\/[^"]*?\/\d+)"/);
         const link = linkMatch ? linkMatch[1] : `https://t.me/${CHANNEL_NAME}`;

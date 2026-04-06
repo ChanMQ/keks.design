@@ -47,9 +47,6 @@ function renderNextBatch() {
     const loadMoreBtn = document.getElementById('load-more-container');
     const nextBatch = allPosts.slice(displayedCount, displayedCount + POSTS_PER_PAGE);
 
-    // Минималистичная SVG заглушка в стиле Clean Tech
-    const fallbackSVG = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`;
-
     nextBatch.forEach((post, index) => {
         const card = document.createElement('a');
         card.href = post.link || "#";
@@ -58,11 +55,13 @@ function renderNextBatch() {
 
         const hasImage = !!post.img;
 
+        // Рендерим контейнер картинки ТОЛЬКО если картинка действительно есть
         card.innerHTML = `
+            ${hasImage ? `
             <div class="case-img-container">
-                <div class="svg-fallback">${fallbackSVG}</div>
-                ${hasImage ? `<div class="skeleton-loader"></div><img class="case-img" alt="Case Image">` : ''}
-            </div>
+                <div class="skeleton-loader"></div>
+                <img class="case-img" alt="Case Image">
+            </div>` : ''}
             <div class="card-content">
                 <div class="case-text">${post.text || 'Без описания'}</div>
                 <div class="case-date">${new Date(post.date).toLocaleDateString('ru-RU', {day:'numeric', month:'short'})}</div>
@@ -71,25 +70,25 @@ function renderNextBatch() {
 
         feedContainer.appendChild(card);
 
-        // Логика плавной предзагрузки картинки
+        // Логика загрузки, если картинка присутствует
         if (hasImage) {
             const imgElement = card.querySelector('.case-img');
             const skeleton = card.querySelector('.skeleton-loader');
+            const imgContainer = card.querySelector('.case-img-container');
 
             const tempImg = new Image();
             tempImg.src = post.img;
 
-            // Как только картинка скачалась - показываем её плавно
+            // Плавное появление
             tempImg.onload = () => {
                 imgElement.src = tempImg.src;
                 imgElement.classList.add('loaded');
-                setTimeout(() => { if(skeleton) skeleton.remove(); }, 600); // Убираем скелетон после fade-in
+                setTimeout(() => { if(skeleton) skeleton.remove(); }, 600);
             };
 
-            // Если картинка недоступна в РФ или битая - убираем скелетон, остается SVG
+            // Если картинка физически битая/недоступна — удаляем блок картинки целиком
             tempImg.onerror = () => {
-                if(skeleton) skeleton.remove();
-                imgElement.remove();
+                if(imgContainer) imgContainer.remove();
             };
         }
 
