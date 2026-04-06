@@ -236,10 +236,10 @@ body.no-scroll {
 
 /* ДИНАМИКА ПРИ ОТСУТСТВИИ КАРТИНКИ */
 .premium-split-modal.no-media .modal-left-pane {
-    display: none; /* Убираем левый блок */
+    display: none;
 }
 .premium-split-modal.no-media .modal-right-pane {
-    width: 100%; /* Текст растягивается на всю ширину */
+    width: 100%;
 }
 
 /* Кнопка закрытия */
@@ -305,10 +305,16 @@ body.no-scroll {
     border-radius: 100px;
 }
 
-/* Текст кейса */
+/* --- ВАЖНОЕ ИСПРАВЛЕНИЕ: Текст в модальном окне больше не обрезается --- */
 .modal-body .case-text {
-    font-size: 1.1rem; color: #E0E0E0; line-height: 1.8; font-weight: 400;
-    white-space: pre-line; /* Обеспечивает отображение всех абзацев */
+    display: block;                  /* Отменяет -webkit-box */
+    -webkit-line-clamp: unset;       /* Отменяет ограничение в 4 строки */
+    overflow: visible;               /* Позволяет тексту отображаться полностью */
+    font-size: 1.1rem;
+    color: #E0E0E0;
+    line-height: 1.8;
+    font-weight: 400;
+    white-space: pre-line;           /* Сохраняет все переносы строк из Telegram */
 }
 
 /* Теги */
