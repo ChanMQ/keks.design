@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>keks.design | Premium UI/UX & Frontend</title>
+    <meta name="description" content="Премиальное портфолио продуктового дизайнера Keks.">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <nav class="navbar reveal">
+        <div class="logo">keks.design</div>
+        <div class="nav-links hidden-mobile">
+            <a href="#about">Обо мне</a>
+            <a href="#services">Услуги</a>
+            <a href="#portfolio">Кейсы</a>
+        </div>
+        <a href="https://t.me/KeksDesign" target="_blank" class="btn-primary btn-small">Связаться</a>
+    </nav>
+
+    <main>
+        <section id="hero" class="hero section">
+            <div class="hero-container reveal">
+                <div class="badge-glass">
+                    <span class="badge-dot"></span> Открыт к проектам
+                </div>
+                <h1 class="hero-title">Дизайн, который<br><span class="text-gradient">создает тренды.</span></h1>
+                <p class="hero-subtitle">Проектирую премиальные интерфейсы, сложные дашборды и платежную инфраструктуру. Эстетика Clean Tech с фокусом на идеальную конверсию.</p>
+                <div class="hero-buttons">
+                    <a href="https://t.me/KeksDesign" target="_blank" class="btn-primary">Обсудить проект</a>
+                    <a href="#portfolio" class="btn-glass">Смотреть работы</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="section">
+            <div class="bento-grid" id="cards-container">
+
+                <div class="bento-item span-2 glass-card reveal">
+                    <div class="card-content">
+                        <h2 class="bento-title">Инженерия опыта</h2>
+                        <p class="bento-text">Я не просто рисую картинки. Более 4 лет я создаю дизайн, который легко верстать и масштабировать. Глубокое понимание Frontend (HTML, CSS, JS) позволяет мне проектировать интерфейсы, которые в коде работают так же безупречно, как выглядят в Figma.</p>
+                    </div>
+                </div>
+
+                <div class="bento-item glass-card reveal" style="transition-delay: 0.1s;">
+                    <div class="card-content">
+                        <h3 class="bento-subtitle text-gradient">Стек & Тулзы</h3>
+                        <ul class="clean-list">
+                            <li>Figma & Auto Layout</li>
+                            <li>Design Systems</li>
+                            <li>Web3 / FinTech UI</li>
+                            <li>Frontend (Vanilla)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bento-item glass-card reveal" style="transition-delay: 0.2s;">
+                    <div class="card-content">
+                        <h3 class="bento-subtitle">Landing Page</h3>
+                        <div class="price">от $500</div>
+                        <p class="bento-text small">Премиальный визуал, глубокая аналитика, 3D/Canvas анимации и подготовка к верстке.</p>
+                    </div>
+                </div>
+
+                <div class="bento-item span-2 glass-card premium-card reveal" style="transition-delay: 0.3s;">
+                    <div class="card-content flex-col h-100">
+                        <div class="bento-header-flex">
+                            <h3 class="bento-subtitle">Web App & Infrastructure</h3>
+                            <div class="price text-gradient">от $1200</div>
+                        </div>
+                        <p class="bento-text">Проектирование сложных дашбордов, крипто-кошельков и платежных шлюзов. Создание масштабируемой и строгой дизайн-системы.</p>
+                        <a href="https://t.me/KeksDesign" class="btn-primary mt-auto w-max">Заказать разработку</a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="portfolio" class="section">
+            <div class="section-header reveal">
+                <h2 class="section-title">Последние кейсы</h2>
+                <a href="https://t.me/casebykeks" target="_blank" class="link-arrow">Telegram-канал ↗</a>
+            </div>
+
+            <div id="tg-feed" class="portfolio-grid">
+                <div class="glass-card loading-card">Синхронизация портфолио...</div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer section reveal">
+        <div class="footer-top">
+            <div class="logo">keks.design</div>
+            <div class="footer-links">
+                <a href="https://t.me/KeksDesign" target="_blank">Личные сообщения</a>
+                <a href="https://t.me/casebykeks" target="_blank">Канал с работами</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 keks.design. Архитектура и дизайн.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
