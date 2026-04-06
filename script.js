@@ -12,7 +12,6 @@ function initScrollAnimations() {
     const reveals = document.querySelectorAll('.reveal');
     const navbarPill = document.getElementById('navbar');
 
-    // Настроили rootMargin, чтобы элементы начинали появляться чуть раньше
     const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -20,7 +19,7 @@ function initScrollAnimations() {
                 obs.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.1, rootMargin: "0px 0px -20px 0px" });
+    }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
 
     reveals.forEach(el => observer.observe(el));
 
@@ -151,8 +150,7 @@ function renderNextBatch() {
             };
         }
 
-        // Ускорили задержку появления для карточек (было 100 * index, стало 50)
-        setTimeout(() => card.classList.add('active'), 50 * index);
+        setTimeout(() => card.classList.add('active'), 100 * index);
     });
 
     displayedCount += nextBatch.length;
@@ -189,6 +187,7 @@ function initModal() {
 
 function openModal(post) {
     const modal = document.getElementById('case-modal');
+    const modalContent = document.querySelector('.premium-split-modal');
     const sliderContainer = document.getElementById('modal-slider-container');
     const modalBodyContainer = document.getElementById('modal-body-container');
     const track = document.getElementById('modal-slider-track');
@@ -218,10 +217,13 @@ function openModal(post) {
 
     slideImages = post.images && post.images.length > 0 ? post.images : (post.img ? [post.img] : []);
 
+    // Проверяем наличие картинок для изменения ширины и отображения сетки
     if (slideImages.length === 0) {
+        modalContent.classList.add('no-media'); // Прячет сетку и растягивает текст
         sliderContainer.style.display = 'none';
         modalBodyContainer.classList.add('no-image');
     } else {
+        modalContent.classList.remove('no-media'); // Возвращает сетку и 55/45
         sliderContainer.style.display = 'flex';
         modalBodyContainer.classList.remove('no-image');
 
@@ -247,6 +249,7 @@ function openModal(post) {
         }
     }
 
+    // ВАЖНО: СБРАСЫВАЕМ СКРОЛЛ НА САМЫЙ ВЕРХ!
     const scrollableArea = document.querySelector('.modal-scrollable');
     if (scrollableArea) {
         scrollableArea.scrollTop = 0;
