@@ -143,9 +143,11 @@ img {
 #typewriter::after { content: '|'; font-weight: 300; color: var(--text-main); animation: blink 1s step-end infinite; margin-left: 4px; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-.hero-divider { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 2.5rem; gap: 2rem; }
+/* Добавлен flex-wrap: wrap для безопасности */
+.hero-divider { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; padding-top: 2.5rem; gap: 2rem; }
 .hero-desc { font-size: 1.15rem; color: var(--text-muted); line-height: 1.6; max-width: 450px; }
-.hero-buttons { display: flex; gap: 1rem; flex-shrink: 0; }
+/* Добавлен flex-wrap: wrap для безопасности */
+.hero-buttons { display: flex; flex-wrap: wrap; gap: 1rem; flex-shrink: 0; }
 
 /* =========================================
    ПРЕМИАЛЬНЫЕ КАРТОЧКИ УСЛУГ (BENTO)
@@ -392,7 +394,10 @@ img {
 @media (max-width: 900px) {
     .navbar-pill { padding: 0.5rem 0.5rem 0.5rem 1.2rem; }
 
-    .hero-massive-title { white-space: normal; min-height: auto; word-break: break-word; }
+    .hero-massive-title { white-space: normal; min-height: 3.4em; word-break: break-word; }
+
+    /* Перестраиваем блок на планшетах, чтобы текст и кнопки не дрались за место */
+    .hero-divider { flex-direction: column; align-items: flex-start; gap: 2rem; }
 
     .bento-grid { grid-template-columns: 1fr; }
     .bento-item.span-2, .bento-item.span-3 { grid-column: span 1; }
@@ -425,21 +430,23 @@ img {
 
     .modal-right-pane { width: 100%; height: auto; flex: 1; min-height: 0; }
 
-    /* Принудительно активная кнопка LZT на мобильных (Планшеты и Телефоны) */
     .sm-cell-lzt { background: #FFFFFF; }
     .sm-cell-lzt .sm-label { color: #666666; }
     .sm-cell-lzt .sm-price { color: #000000; }
     .sm-cell-lzt .lzt-icon { color: #000000; }
 }
 
-/* Мобильные телефоны */
-@media (max-width: 480px) {
+/* Мобильные экраны: Увеличено до 600px для охвата разрешения 481px и повернутых экранов */
+@media (max-width: 600px) {
     .section { padding: 5rem 1rem 2rem; }
     .card-content { padding: 2rem 1.5rem; }
 
-    .hero-massive-title { font-size: 2.6rem; letter-spacing: -1px; margin-bottom: 3rem; }
+    .hero-massive-title { font-size: 2.6rem; letter-spacing: -1px; margin-bottom: 3rem; min-height: 3.4em; }
+
     .hero-desc { font-size: 1rem; }
     .hero-divider { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+
+    /* Кнопки теперь 100% ширины и всегда влезают */
     .hero-buttons { width: 100%; flex-direction: column; }
     .hero-buttons a { width: 100%; text-align: center; }
 
