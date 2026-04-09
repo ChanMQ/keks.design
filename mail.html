@@ -1,104 +1,156 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Открытие почты | KEKS.DESIGN</title>
-    <style>
-        /* Строгий и чистый стиль, подходящий под современный веб */
-        body {
-            background-color: #0A0A0A; /* Глубокий солидный темный цвет */
-            color: #FFFFFF;
-            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
-        .container {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-        }
-        .text {
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            color: #888888;
-        }
-        /* Минималистичный SVG-лоадер */
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 2px solid #333333;
-            border-top: 2px solid #FFFFFF;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Открытие почты</title>
 
-        /* Ссылка на случай, если почта не открылась автоматически */
-        .fallback {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #555555;
-        }
-        .fallback a {
-            color: #888888;
-            text-decoration: underline;
-        }
-        .fallback a:hover {
-            color: #FFFFFF;
-        }
-    </style>
+<style>
+:root {
+    --bg: #000;
+    --card: #0A0A0A;
+    --border: #1A1A1A;
+    --text: #FFFFFF;
+    --muted: #777;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* карточка */
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 36px;
+    text-align: center;
+    width: 100%;
+    max-width: 420px;
+
+    animation: fadeUp 0.6s ease;
+}
+
+/* заголовок */
+.title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 16px;
+}
+
+/* текст */
+.text {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: var(--muted);
+}
+
+/* loader */
+.spinner {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #222;
+    border-top: 2px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+/* fallback */
+.fallback {
+    margin-top: 24px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    display: none;
+}
+
+.fallback a {
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid #333;
+    padding-bottom: 2px;
+    transition: 0.3s;
+}
+
+.fallback a:hover {
+    border-color: #fff;
+}
+
+/* анимации */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <div class="container">
-        <div class="spinner"></div>
-        <div class="text">Открываем почтовый клиент...</div>
-        <div class="fallback" id="fallback-msg" style="display: none;">
-            Не открылось автоматически? <a id="manual-link" href="#">Нажмите здесь</a>
-        </div>
+<div class="card">
+    <div class="spinner"></div>
+
+    <div class="title">Открываем почту</div>
+    <div class="text">Подготавливаем письмо для отправки…</div>
+
+    <div class="fallback" id="fallback-msg">
+        Не открылось автоматически?
+        <br>
+        <a id="manual-link" href="#">Открыть вручную</a>
     </div>
+</div>
 
-    <script>
-        // Читаем email из адресной строки (из параметра ?to=...)
-        const urlParams = new URLSearchParams(window.location.search);
-        const userEmail = urlParams.get('to');
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const userEmail = urlParams.get('to');
 
+setTimeout(() => {
+    if (userEmail) {
+        const mailtoLink = `mailto:${encodeURIComponent(userEmail)}`;
+
+        // пробуем открыть
+        window.location.href = mailtoLink;
+
+        // fallback
         setTimeout(() => {
-            if (userEmail) {
-                // Формируем ссылку mailto
-                const mailtoLink = `mailto:${encodeURIComponent(userEmail)}`;
+            const fallback = document.getElementById('fallback-msg');
+            const link = document.getElementById('manual-link');
 
-                // Пробуем открыть почтовый клиент
-                window.location.href = mailtoLink;
+            link.href = mailtoLink;
+            fallback.style.display = 'block';
 
-                // Показываем запасную ссылку через пару секунд,
-                // так как страница не закроется сама при вызове mailto
-                setTimeout(() => {
-                    const fallbackMsg = document.getElementById('fallback-msg');
-                    const manualLink = document.getElementById('manual-link');
-                    manualLink.href = mailtoLink;
-                    fallbackMsg.style.display = 'block';
-                    document.querySelector('.spinner').style.display = 'none';
-                    document.querySelector('.text').innerText = 'Почтовый клиент должен был открыться.';
-                }, 2000);
+            document.querySelector('.spinner').style.display = 'none';
+            document.querySelector('.title').innerText = 'Почта не открылась';
+            document.querySelector('.text').innerText = 'Попробуйте открыть вручную или используйте VPN.';
+        }, 1800);
 
-            } else {
-                // Если зашли без почты — кидаем на главную
-                window.location.href = '/';
-            }
-        }, 600);
-    </script>
+    } else {
+        window.location.href = "/";
+    }
+}, 500);
+</script>
 
 </body>
 </html>
