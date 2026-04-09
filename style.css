@@ -299,7 +299,7 @@ body.hide-dock .mobile-dock-nav { transform: translateY(150%); opacity: 0; point
 ========================================= */
 
 @media (hover: hover) and (pointer: fine) {
-    .footer-email-text:hover { color: var(--text-main); transform: translateX(4px); }
+    .footer-email-text:hover { color: var(--text-main) }
     .btn-primary:hover { transform: translateY(-2px); background: #E0E0E0; }
     .btn-secondary:hover { background: var(--card-bg); border-color: var(--border-hover); }
     #load-more-btn:hover { background: var(--text-main); color: var(--bg-base); border-color: var(--text-main); transform: translateY(-2px); }
