@@ -74,7 +74,8 @@ const dict = {
         form_err_tg: "Telegram должен содержать от 4 символов.",
         form_err_msg: "Сообщение должно быть от 5 символов.",
         form_empty_error: "Пожалуйста, заполните выделенные поля.",
-        form_email_direct: "Написать мне на почту"
+        form_email_direct: "Написать мне на почту",
+        form_vpn_notice: "Пользователям из РФ рекомендуется включить VPN для стабильной отправки формы, либо написать напрямую на <a href=\"mailto:send@keks.design\" style=\"color: var(--text-main);\">send@keks.design</a>."
     },
     en: {
         nav_about: "About", nav_cases: "Cases", nav_contact: "Contact",
@@ -103,7 +104,8 @@ const dict = {
         form_err_tg: "Telegram must be at least 4 characters.",
         form_err_msg: "Message must be at least 5 characters.",
         form_empty_error: "Please fill out the highlighted fields.",
-        form_email_direct: "Email me directly"
+        form_email_direct: "Email me directly",
+        form_vpn_notice: "Users from the Russian Federation are recommended to enable a VPN for stable form submission, or email directly at <a href=\"mailto:send@keks.design\" style=\"color: var(--text-main);\">send@keks.design</a>."
     }
 };
 
