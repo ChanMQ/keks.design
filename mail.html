@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Открытие Gmail | KEKS.DESIGN</title>
+    <title>Открытие почты | KEKS.DESIGN</title>
     <style>
         /* Строгий и чистый стиль, подходящий под современный веб */
         body {
@@ -43,13 +43,30 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Ссылка на случай, если почта не открылась автоматически */
+        .fallback {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #555555;
+        }
+        .fallback a {
+            color: #888888;
+            text-decoration: underline;
+        }
+        .fallback a:hover {
+            color: #FFFFFF;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="spinner"></div>
-        <div class="text">Перенаправление в Gmail...</div>
+        <div class="text">Открываем почтовый клиент...</div>
+        <div class="fallback" id="fallback-msg" style="display: none;">
+            Не открылось автоматически? <a id="manual-link" href="#">Нажмите здесь</a>
+        </div>
     </div>
 
     <script>
@@ -57,13 +74,27 @@
         const urlParams = new URLSearchParams(window.location.search);
         const userEmail = urlParams.get('to');
 
-        // Небольшая задержка для плавности интерфейса (опционально)
         setTimeout(() => {
             if (userEmail) {
-                // Кидаем сразу в окно написания письма Gmail
-                window.location.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(userEmail)}`;
+                // Формируем ссылку mailto
+                const mailtoLink = `mailto:${encodeURIComponent(userEmail)}`;
+
+                // Пробуем открыть почтовый клиент
+                window.location.href = mailtoLink;
+
+                // Показываем запасную ссылку через пару секунд,
+                // так как страница не закроется сама при вызове mailto
+                setTimeout(() => {
+                    const fallbackMsg = document.getElementById('fallback-msg');
+                    const manualLink = document.getElementById('manual-link');
+                    manualLink.href = mailtoLink;
+                    fallbackMsg.style.display = 'block';
+                    document.querySelector('.spinner').style.display = 'none';
+                    document.querySelector('.text').innerText = 'Почтовый клиент должен был открыться.';
+                }, 2000);
+
             } else {
-                // Если кто-то зашел просто на keks.design/mail.html без почты — кидаем на главную
+                // Если зашли без почты — кидаем на главную
                 window.location.href = '/';
             }
         }, 600);
