@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchTelegramPosts();
     initModal();
     applyLanguage();
+    initContactForm();
 
-    // Плавный скролл для якорных ссылок внутри app-wrapper
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             const targetId = this.getAttribute('href');
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const wrapper = document.getElementById('app-wrapper');
                 if (wrapper) {
                     wrapper.scrollTo({
-                        top: targetElement.offsetTop - 80, // Отступ под шапку
+                        top: targetElement.offsetTop - 80,
                         behavior: 'smooth'
                     });
                 }
@@ -30,26 +30,20 @@ document.addEventListener('DOMContentLoaded', () => {
 ========================================= */
 let currentLang = 'ru';
 
-// Функция определения языка по URL при входе
 function initLanguageFromURL() {
     const path = window.location.pathname.toLowerCase();
     const params = new URLSearchParams(window.location.search);
     const hash = window.location.hash.toLowerCase();
 
-    // 1. Проверяем путь (например, /en или /ru)
     if (path === '/en' || path === '/en/') currentLang = 'en';
     else if (path === '/ru' || path === '/ru/') currentLang = 'ru';
-    // 2. Проверяем GET параметры (?lang=en)
     else if (params.get('lang') === 'en' || params.get('lang') === 'ru') currentLang = params.get('lang');
-    // 3. Проверяем хэш (#en)
     else if (hash === '#en' || hash === '#ru') currentLang = hash.replace('#', '');
-    // 4. Иначе берем из localStorage (если есть) или оставляем 'ru'
     else currentLang = localStorage.getItem('keks_lang') || 'ru';
 
     localStorage.setItem('keks_lang', currentLang);
 }
 
-// Запускаем до загрузки DOM, чтобы язык определился сразу
 initLanguageFromURL();
 
 const dict = {
@@ -57,7 +51,7 @@ const dict = {
         nav_about: "Обо мне", nav_cases: "Кейсы", nav_contact: "Связаться",
         hero_status: "Открыт к проектам", hero_title: "Создаю",
         hero_desc: "Разрабатываю премиальные интерфейсы и сложные Web3-продукты. Строгая эстетика, чистый код и фокус на конверсию.",
-        hero_btn_discuss: "Обсудить проект ↗", hero_btn_cases: "Смотреть работы ↓",
+        hero_btn_discuss: "Обсудить проект ↓", hero_btn_cases: "Смотреть работы ↓",
         bento_01_badge: "✦ Опыт & Подход", bento_01_title: "Архитектура<br><span class=\"text-muted\">смыслов.</span>",
         bento_01_text: "Я не просто рисую картинки. Более 4 лет я создаю дизайн, который легко верстать и масштабировать. Глубокое понимание Frontend позволяет мне проектировать интерфейсы, которые в коде работают так же безупречно, как выглядят в Figma.",
         bento_02_title: "Тех-Стек", bento_03_title: "Направления & Стоимость",
@@ -69,13 +63,23 @@ const dict = {
         modal_dm_btn: "Написать мне",
         err_title: "Архитектура<br><span class=\"text-muted\">дала сбой.</span>",
         err_desc: "Вы попали в тупик. Страница удалена, перенесена в другой блок, либо её здесь никогда не было. В любом случае, тут только чистый код и пустота.",
-        err_btn: "Вернуться на базу ↗"
+        err_btn: "Вернуться на базу ↗",
+
+        form_badge: "✦ Связь", form_title: "Связаться<br><span class=\"text-muted\">со мной.</span>", form_submit: "Отправить сообщение",
+        form_tg_direct: "Написать сразу в Telegram",
+        form_msg_ph: "Расскажите кратко о вашем проекте...", form_sending: "Отправка...", form_success: "Отправлено! Свяжусь в ближайшее время.",
+        form_error: "Ошибка отправки. Напишите в Telegram напрямую.", form_timeout: "Сервер не отвечает. Напишите напрямую.",
+
+        form_err_email: "Почта должна содержать @ и домен.",
+        form_err_tg: "Telegram должен содержать от 4 символов.",
+        form_err_msg: "Сообщение должно быть от 5 символов.",
+        form_empty_error: "Пожалуйста, заполните выделенные поля."
     },
     en: {
         nav_about: "About", nav_cases: "Cases", nav_contact: "Contact",
         hero_status: "Available for work", hero_title: "I create",
         hero_desc: "Designing premium interfaces and complex Web3 products. Strict aesthetics, clean code, and focus on conversion.",
-        hero_btn_discuss: "Discuss project ↗", hero_btn_cases: "View works ↓",
+        hero_btn_discuss: "Discuss project ↓", hero_btn_cases: "View works ↓",
         bento_01_badge: "✦ Experience & Approach", bento_01_title: "Architecture<br><span class=\"text-muted\">of meaning.</span>",
         bento_01_text: "I don't just draw pictures. For over 4 years I've been creating designs that are easy to code and scale. Deep understanding of Frontend allows me to design interfaces that work in code as flawlessly as they look in Figma.",
         bento_02_title: "Tech Stack", bento_03_title: "Services & Pricing",
@@ -87,7 +91,17 @@ const dict = {
         modal_dm_btn: "Message me",
         err_title: "Architecture<br><span class=\"text-muted\">failed.</span>",
         err_desc: "You've hit a dead end. The page was deleted, moved to another block, or it never existed here. Either way, there's only clean code and emptiness left.",
-        err_btn: "Return to base ↗"
+        err_btn: "Return to base ↗",
+
+        form_badge: "✦ Contact", form_title: "Get in<br><span class=\"text-muted\">touch.</span>", form_submit: "Send message",
+        form_tg_direct: "Message directly on Telegram",
+        form_msg_ph: "Tell me briefly about your project...", form_sending: "Sending...", form_success: "Sent! I'll be in touch soon.",
+        form_error: "Error sending. Please DM me.", form_timeout: "Server timeout. Please DM me directly.",
+
+        form_err_email: "Email must contain @ and a domain.",
+        form_err_tg: "Telegram must be at least 4 characters.",
+        form_err_msg: "Message must be at least 5 characters.",
+        form_empty_error: "Please fill out the highlighted fields."
     }
 };
 
@@ -99,17 +113,17 @@ const typewriterWords = {
 function applyLanguage() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (dict[currentLang][key]) {
-            el.innerHTML = dict[currentLang][key];
-        }
+        if (dict[currentLang][key]) el.innerHTML = dict[currentLang][key];
+    });
+
+    document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+        const key = el.getAttribute('data-i18n-ph');
+        if (dict[currentLang][key]) el.placeholder = dict[currentLang][key];
     });
 
     document.querySelectorAll('.lang-toggle').forEach(toggle => {
-        if (currentLang === 'en') {
-            toggle.classList.add('en-active');
-        } else {
-            toggle.classList.remove('en-active');
-        }
+        if (currentLang === 'en') toggle.classList.add('en-active');
+        else toggle.classList.remove('en-active');
     });
 }
 
@@ -117,7 +131,6 @@ window.toggleLanguage = function() {
     currentLang = currentLang === 'ru' ? 'en' : 'ru';
     localStorage.setItem('keks_lang', currentLang);
 
-    // Обновляем URL без перезагрузки страницы
     const url = new URL(window.location);
     const path = url.pathname.toLowerCase();
 
@@ -135,6 +148,136 @@ window.toggleLanguage = function() {
     applyLanguage();
     initTypewriter();
 };
+
+/* =========================================
+   ЛОГИКА ФОРМЫ СВЯЗИ С КАСТОМНОЙ ВАЛИДАЦИЕЙ
+========================================= */
+window.toggleContactMethod = function() {
+    const toggle = document.getElementById('contact-method-toggle');
+    const valInput = document.getElementById('contact-method-val');
+    const handleInput = document.getElementById('contact-handle');
+
+    toggle.classList.toggle('email-active');
+
+    if (toggle.classList.contains('email-active')) {
+        valInput.value = 'email';
+        handleInput.placeholder = 'your@email.com';
+    } else {
+        valInput.value = 'telegram';
+        handleInput.placeholder = '@username';
+    }
+};
+
+function initContactForm() {
+    const form = document.getElementById('contact-form');
+    if(!form) return;
+
+    document.querySelectorAll('.matrix-input').forEach(input => {
+        input.addEventListener('input', () => {
+            input.classList.remove('error-field');
+        });
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btn = document.getElementById('contact-submit-btn');
+        const status = document.getElementById('contact-status');
+
+        const method = document.getElementById('contact-method-val').value;
+        const contactInput = document.getElementById('contact-handle');
+        const messageInput = document.getElementById('contact-message');
+
+        const contactVal = contactInput.value.trim();
+        const messageVal = messageInput.value.trim();
+
+        let hasError = false;
+        let currentErrorMsg = "";
+
+        if (method === 'telegram') {
+            if (contactVal.length < 4) {
+                contactInput.classList.add('error-field');
+                hasError = true;
+                currentErrorMsg = dict[currentLang]['form_err_tg'];
+            }
+        } else if (method === 'email') {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(contactVal)) {
+                contactInput.classList.add('error-field');
+                hasError = true;
+                currentErrorMsg = dict[currentLang]['form_err_email'];
+            }
+        }
+
+        if (messageVal.length < 5) {
+            messageInput.classList.add('error-field');
+            hasError = true;
+            if (!currentErrorMsg) currentErrorMsg = dict[currentLang]['form_err_msg'];
+        }
+
+        if (!contactVal && !messageVal) {
+            currentErrorMsg = dict[currentLang]['form_empty_error'];
+        }
+
+        if (hasError) {
+            status.style.color = '#ff4444';
+            status.innerText = currentErrorMsg;
+            status.style.display = 'block';
+            setTimeout(() => {
+                if(status.innerText === currentErrorMsg) status.style.display = 'none';
+            }, 4000);
+            return;
+        }
+
+        btn.innerText = dict[currentLang]['form_sending'];
+        btn.disabled = true;
+        status.style.display = 'none';
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        try {
+            const WORKER_URL = 'https://keks-design.dmitriysbarash.workers.dev/';
+
+            const res = await fetch(WORKER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ method, contact: contactVal, message: messageVal }),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if(res.ok) {
+                status.style.color = '#FFFFFF';
+                status.innerText = dict[currentLang]['form_success'];
+                form.reset();
+                document.getElementById('contact-method-toggle').classList.remove('email-active');
+                document.getElementById('contact-method-val').value = 'telegram';
+                document.getElementById('contact-handle').placeholder = '@username';
+            } else {
+                throw new Error('Bad response');
+            }
+        } catch(err) {
+            clearTimeout(timeoutId);
+            status.style.color = '#8A8A93';
+
+            if (err.name === 'AbortError') {
+                status.innerText = dict[currentLang]['form_timeout'];
+            } else {
+                status.innerText = dict[currentLang]['form_error'];
+            }
+        } finally {
+            btn.innerText = dict[currentLang]['form_submit'];
+            btn.disabled = false;
+            status.style.display = 'block';
+
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
+    });
+}
 
 /* =========================================
    ГЛОБАЛЬНЫЙ ЗАПРЕТ ЗУМА СТРАНИЦЫ
@@ -334,7 +477,6 @@ function renderNextBatch() {
 if(document.getElementById('load-more-btn')) {
     document.getElementById('load-more-btn').addEventListener('click', renderNextBatch);
 }
-
 
 /* =========================================
    Логика Модального Окна
