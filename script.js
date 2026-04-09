@@ -180,26 +180,6 @@ function initContactForm() {
         });
     });
 
-    // Функция для автоматических повторов запроса (спасает при обрывах связи)
-    async function fetchWithRetry(url, options, retries = 3) {
-        let lastError;
-        for (let i = 0; i < retries; i++) {
-            try {
-                const response = await fetch(url, options);
-                if (response.ok) return response;
-                throw new Error(`HTTP error: ${response.status}`);
-            } catch (err) {
-                lastError = err;
-                if (err.name === 'AbortError') throw err; // Таймауты не ретраим
-                if (i < retries - 1) {
-                    // Ждем 1 секунду перед следующей попыткой
-                    await new Promise(res => setTimeout(res, 1000));
-                }
-            }
-        }
-        throw lastError;
-    }
-
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -275,11 +255,9 @@ function initContactForm() {
         const timeoutId = setTimeout(() => controller.abort(), 15000);
 
         try {
-            // ИСПОЛЬЗУЕМ ОТНОСИТЕЛЬНЫЙ ПУТЬ (без tg.keks.design)
-            const WORKER_URL = '/api/contact';
+            const WORKER_URL = 'https://tg.keks.design/';
 
-            // Используем новую функцию с автоповторами
-            await fetchWithRetry(WORKER_URL, {
+            const response = await fetch(WORKER_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -289,22 +267,25 @@ function initContactForm() {
 
             clearTimeout(timeoutId);
 
-            status.style.color = '#FFFFFF';
-            status.innerText = dict[currentLang]['form_success'];
+            if (response.ok) {
+                status.style.color = '#FFFFFF';
+                status.innerText = dict[currentLang]['form_success'];
 
-            form.reset();
-            document.getElementById('contact-method-toggle').classList.remove('email-active');
-            document.getElementById('contact-method-val').value = 'telegram';
-            document.getElementById('contact-handle').placeholder = '@username';
-
+                form.reset();
+                document.getElementById('contact-method-toggle').classList.remove('email-active');
+                document.getElementById('contact-method-val').value = 'telegram';
+                document.getElementById('contact-handle').placeholder = '@username';
+            } else {
+                throw new Error(`Bad response: ${response.status}`);
+            }
         } catch (err) {
             clearTimeout(timeoutId);
             status.style.color = '#8A8A93';
 
             if (err.name === 'AbortError') {
-                status.innerText = 'Сервер отвечает слишком долго. Напишите в Telegram напрямую.';
+                status.innerText = 'Сервер отвечает слишком долго. Попробуйте ещё раз или используйте VPN.';
             } else {
-                status.innerText = 'Сетевая блокировка. Пожалуйста, напишите в Telegram напрямую.';
+                status.innerText = 'Проблема с соединением. Если не проходит — попробуйте через VPN.';
             }
 
             console.error('Contact form submit error:', err);
@@ -315,7 +296,7 @@ function initContactForm() {
 
             setTimeout(() => {
                 status.style.display = 'none';
-            }, 7000); // Чуть дольше показываем статус, чтобы человек успел прочитать
+            }, 5000);
         }
     });
 }
