@@ -10,7 +10,8 @@
     <meta property="og:url" content="https://keks.design/404">
     <meta property="og:title" content="Архитектура дала сбой [404]">
     <meta property="og:description" content="Вы попали в тупик. Страница удалена, перенесена в другой блок, либо её здесь никогда не было.">
-    <meta property="og:image" content="https://keks.design/favicon.png"> <meta name="twitter:card" content="summary">
+    <meta property="og:image" content="https://keks.design/favicon.png">
+    <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Архитектура дала сбой [404]">
     <meta name="twitter:description" content="Вы попали в тупик. Страница удалена, перенесена в другой блок, либо её здесь никогда не было.">
     <meta name="twitter:image" content="https://keks.design/favicon.png">
@@ -24,7 +25,6 @@
 <body>
 
     <div id="app-wrapper" class="app-wrapper">
-
         <div class="blueprint-bg" style="position: fixed; width: 100vw; height: 100vh; height: 100dvh; z-index: -1;"></div>
 
         <header class="header-wrapper reveal active">
@@ -33,12 +33,19 @@
                     <span>keks<span class="text-muted">.design</span></span>
                 </a>
 
-                <div class="nav-links hidden-mobile">
-                    <a href="/#about">Обо мне</a>
-                    <a href="/#portfolio">Кейсы</a>
+                <div class="nav-links hidden-mobile" style="display: flex; align-items: center; gap: 1.5rem;">
+                    <a href="/#about" data-i18n="nav_about">Обо мне</a>
+                    <a href="/#portfolio" data-i18n="nav_cases">Кейсы</a>
                 </div>
 
-                <a href="https://t.me/KeksDesign" target="_blank" class="btn-primary btn-small">Связаться</a>
+                <div class="nav-actions" style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="lang-toggle hidden-mobile" onclick="toggleLanguage()">
+                        <div class="lang-toggle-slider"></div>
+                        <span class="lang-label ru">RU</span>
+                        <span class="lang-label en">EN</span>
+                    </div>
+                    <a href="https://t.me/KeksDesign" target="_blank" class="btn-primary btn-small" data-i18n="nav_contact">Связаться</a>
+                </div>
             </nav>
         </header>
 
@@ -50,24 +57,36 @@
                         [ 404 ]
                     </div>
 
-                    <h1 class="hero-massive-title" style="margin-bottom: 2rem; white-space: normal;">
+                    <h1 class="hero-massive-title" style="margin-bottom: 2rem; white-space: normal;" data-i18n="err_title">
                         Архитектура<br>
                         <span class="text-muted">дала сбой.</span>
                     </h1>
 
-                    <p class="hero-desc" style="text-align: center; margin-bottom: 3.5rem; max-width: 500px;">
+                    <p class="hero-desc" style="text-align: center; margin-bottom: 3.5rem; max-width: 500px;" data-i18n="err_desc">
                         Вы попали в тупик. Страница удалена, перенесена в другой блок, либо её здесь никогда не было. В любом случае, тут только чистый код и пустота.
                     </p>
 
                     <div class="hero-buttons" style="justify-content: center;">
-                        <a href="/" class="btn-primary">Вернуться на базу ↗</a>
+                        <a href="/" class="btn-primary" data-i18n="err_btn">Вернуться на базу ↗</a>
                     </div>
 
                 </div>
             </section>
         </main>
-
     </div>
+
+    <nav class="mobile-dock-nav">
+        <div class="mobile-dock-inner">
+            <a href="/#about" class="md-item" data-i18n="nav_about">Обо мне</a>
+            <a href="/#portfolio" class="md-item" data-i18n="nav_cases">Кейсы</a>
+
+            <div class="lang-toggle" onclick="toggleLanguage()">
+                <div class="lang-toggle-slider"></div>
+                <span class="lang-label ru">RU</span>
+                <span class="lang-label en">EN</span>
+            </div>
+        </div>
+    </nav>
 
     <script src="/script.js"></script>
 </body>

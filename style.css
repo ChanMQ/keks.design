@@ -49,7 +49,7 @@ a, button, .slider-dots .dot, .sm-cell-lzt {
     touch-action: manipulation;
 }
 
-/* Запрет на перетаскивание картинок браузером (Важно для Firefox) */
+/* Запрет на перетаскивание картинок браузером */
 img {
     -webkit-user-drag: none;
     -khtml-user-drag: none;
@@ -199,7 +199,6 @@ img {
 .bento-divider { width: 50px; height: 2px; background: var(--border-hover); margin-bottom: 2rem; }
 .bento-text { color: #A0A0A5; font-size: 1.15rem; line-height: 1.7; font-weight: 400; max-width: 90%; }
 .bento-title { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.5px; margin: 0; }
-.mb-3 { margin-bottom: 2.5rem; }
 
 
 /* =========================================
@@ -413,7 +412,6 @@ img {
 }
 .lightbox-overlay.active { opacity: 1; pointer-events: auto; }
 
-/* Трек для лайтбокса: центрует фото и ловит события */
 .lightbox-track {
     width: 100%; height: 100%;
     display: flex; justify-content: center; align-items: center;
@@ -427,7 +425,7 @@ img {
 
 
 /* =========================================
-   НОВАЯ ДОК-ПАНЕЛЬ ВНИЗУ (для Лайтбокса)
+   ДОК-ПАНЕЛЬ ВНИЗУ (для Лайтбокса)
 ========================================= */
 .lightbox-dock {
     position: absolute;
@@ -442,7 +440,7 @@ img {
     padding: 10px 20px;
     border-radius: 100px;
     z-index: 2020;
-    pointer-events: auto;
+    /* УДАЛЕНО pointer-events: auto; (оно перекрывало основное меню на мобилках) */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
@@ -464,7 +462,7 @@ img {
     height: 34px;
     border-radius: 50%;
     transition: var(--transition);
-    font-size: 1.2rem; /* Для крестика */
+    font-size: 1.2rem;
 }
 
 .dock-btn svg {
@@ -607,8 +605,8 @@ img {
     .bento-grid { grid-template-columns: 1fr; }
     .bento-item.span-2, .bento-item.span-3 { grid-column: span 1; }
 
-    .hidden-mobile { display: none; }
-    .footer { padding: 3rem 2rem; margin: 0 1rem 0 1rem; width: auto; border-radius: 24px 24px 0 0; }
+    .hidden-mobile { display: none !important; }
+    .footer { padding: 3rem 2rem 110px 2rem; margin: 0 1rem; width: auto; border-radius: 24px 24px 0 0; }
     .footer-grid { grid-template-columns: 1fr; gap: 3rem; }
 
     .footer-right { width: 100%; align-items: flex-start; }
@@ -669,4 +667,132 @@ img {
 
     .lightbox-dock { padding: 8px 16px; bottom: 1.5rem; }
     #lb-zoom-slider { width: 80px; }
+}
+
+/* =========================================
+   МУЛЬТИМЕДИА И ВИДЕО
+========================================= */
+.case-img-container video,
+.slider-track video,
+.lightbox-track video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.slider-track video,
+.lightbox-track video {
+    object-fit: contain;
+    padding: 2rem;
+    will-change: transform;
+}
+
+/* =========================================
+   ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА (ТУМБЛЕР)
+========================================= */
+.lang-toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 100px;
+    padding: 4px;
+    cursor: pointer;
+    width: 80px;
+    height: 36px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.lang-toggle-slider {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 34px;
+    height: 28px;
+    background: var(--text-main);
+    border-radius: 100px;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1;
+}
+
+/* Смещение ползунка, когда активен английский */
+.lang-toggle.en-active .lang-toggle-slider {
+    transform: translateX(38px);
+}
+
+.lang-label {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: color 0.3s ease;
+}
+
+/* Цвета текста при переключении */
+.lang-toggle:not(.en-active) .lang-label.ru { color: var(--bg-base); }
+.lang-toggle.en-active .lang-label.en { color: var(--bg-base); }
+
+
+/* =========================================
+   МОБИЛЬНЫЙ ДОК (НАВИГАЦИЯ ВНИЗУ)
+========================================= */
+.mobile-dock-nav {
+    display: none;
+    position: fixed;
+    bottom: calc(1rem + env(safe-area-inset-bottom));
+    left: 1rem;
+    width: calc(100% - 2rem);
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    border-radius: 100px;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+}
+
+/* Класс для скрытия дока, когда открыта модалка или лайтбокс */
+body.hide-dock .mobile-dock-nav {
+    transform: translateY(150%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.mobile-dock-inner {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 60px;
+    padding: 0 0.5rem;
+}
+
+.md-item {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+.md-item:active {
+    color: var(--text-main);
+}
+
+/* АДАПТИВНОСТЬ ДЛЯ ДОКА И СКРЫТИЯ ЛИШНЕГО */
+@media (max-width: 900px) {
+    .mobile-dock-nav {
+        display: block;
+    }
+    .app-wrapper {
+        padding-bottom: 0;
+    }
 }
