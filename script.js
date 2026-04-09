@@ -237,7 +237,7 @@ function initContactForm() {
         const timeoutId = setTimeout(() => controller.abort(), 5000);
 
         try {
-            const WORKER_URL = 'https://keks-design.dmitriysbarash.workers.dev/';
+            const WORKER_URL = 'https://api.keks.design/';
 
             const res = await fetch(WORKER_URL, {
                 method: 'POST',
