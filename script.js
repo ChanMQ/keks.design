@@ -281,9 +281,9 @@ function initContactForm() {
             status.style.color = '#8A8A93';
 
             if (err.name === 'AbortError') {
-                status.innerText = 'Сервер долго отвечает. Попробуйте ещё раз.';
+                status.innerText = 'Сервер отвечает слишком долго. Попробуйте ещё раз или используйте VPN.';
             } else {
-                status.innerText = 'Ошибка сети. Проверьте интернет или напишите напрямую.';
+                status.innerText = 'Проблема с соединением. Если не проходит — попробуйте через VPN.';
             }
 
             console.error('Contact form submit error:', err);
